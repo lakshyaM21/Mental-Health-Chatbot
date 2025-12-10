@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MindCare • Calm ASMR Chat</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <div class="mc-page">
+    <div class="mc-card">
+
+      <!-- HEADER -->
+      <header class="mc-header">
+        <div class="mc-header-left">
+          <div class="mc-logo">
+            <span class="mc-logo-icon">🧠</span>
+          </div>
+          <div class="mc-title-block">
+            <h1 class="mc-app-title">MindCare Calm Chat</h1>
+            <p class="mc-app-subtitle">
+              A slow, soft space to breathe, reflect, and feel heard ✨
+            </p>
+          </div>
+        </div>
+
+        <div class="mc-header-right">
+          <button type="button" class="mc-main-btn">
+            <span class="mc-main-btn-icon">🌊</span>
+            <span class="mc-main-btn-text">Start calm session</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- WARNING -->
+      <section class="mc-alert">
+        <div class="mc-alert-icon">🕊️</div>
+        <div class="mc-alert-text">
+          <strong>Gentle reminder:</strong>
+          <span>
+            This chatbot offers emotional support and information, but is not a substitute
+            for professional mental health care. If you feel unsafe or in crisis,
+            contact emergency services immediately.
+          </span>
+        </div>
+      </section>
+
+      <!-- CHAT WINDOW -->
+      <section class="mc-chat-shell">
+        <div class="mc-chat" id="chat-container">
+          <div class="mc-msg mc-msg-bot">
+            <div class="mc-avatar mc-avatar-bot">AI</div>
+            <div class="mc-bubble mc-bubble-bot">
+              <p>Welcome, I’m MindCare. 🌿</p>
+              <p>Take a deep breath... I'm here to listen. What’s on your mind today?</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- INPUT BAR -->
+        <form class="mc-input-bar" id="chat-form">
+          <textarea id="user-input" class="mc-input" rows="1"
+            placeholder="Share whatever you feel comfortable sharing..."></textarea>
+          <button type="submit" class="mc-send-btn">
+            <span>Send</span>
+          </button>
+        </form>
+      </section>
+
+      <!-- FOOTER -->
+      <footer class="mc-footer">
+        <p>Powered by <strong>MindCare</strong> • Breathe in calm, breathe out stress 🌙</p>
+      </footer>
+
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT -->
+  <script>
+    const chatForm = document.getElementById("chat-form");
+    const chatContainer = document.getElementById("chat-container");
+    const userInput = document.getElementById("user-input");
+
+    function addUserMessage(text) {
+      chatContainer.innerHTML += `
+        <div class="mc-msg mc-msg-user">
+          <div class="mc-avatar mc-avatar-user">You</div>
+          <div class="mc-bubble mc-bubble-user"><p>${text}</p></div>
+        </div>`;
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+
+    function addBotMessage(text) {
+      chatContainer.innerHTML += `
+        <div class="mc-msg mc-msg-bot">
+          <div class="mc-avatar mc-avatar-bot">AI</div>
+          <div class="mc-bubble mc-bubble-bot"><p>${text}</p></div>
+        </div>`;
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+
+    chatForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const message = userInput.value.trim();
+      if (!message) return;
+
+      addUserMessage(message);
+      userInput.value = "";
+
+      addBotMessage("Typing...");
+
+      const res = await fetch("/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message })
+      });
+
+      const data = await res.json();
+
+      // Remove "Typing..." bubble
+      chatContainer.lastElementChild.remove();
+
+      addBotMessage(data.reply || "Something went wrong.");
+    });
+  </script>
+
+</body>
+</html>
